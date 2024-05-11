@@ -1,0 +1,65 @@
+using UnityEngine;
+
+public class HeadsetPresenceDetector : MonoBehaviour
+{
+	private bool isHeadsetMounted = false;
+
+	// Start is called before the first frame update
+	void Start()
+	{
+		if (OVRManager.isHmdPresent)
+		{
+			Debug.Log("OVRManager is present and initialized.");
+			OVRManager.HMDMounted += OnHMDMounted;
+			OVRManager.HMDUnmounted += OnHMDUnmounted;
+		}
+		else
+		{
+			Debug.LogError("OVRManager is not present. Please ensure it is properly set up.");
+		}
+	}
+
+	private void OnHMDMounted()
+	{
+		isHeadsetMounted = true;
+		Debug.Log("Headset is mounted");
+		// Code to execute when the headset is put on
+	}
+
+	private void OnHMDUnmounted()
+	{
+		isHeadsetMounted = false;
+		Debug.Log("Headset is unmounted");
+		// Code to execute when the headset is taken off
+	}
+
+	void OnDestroy()
+	{
+		// Unsubscribe from the events when the script is destroyed
+		if (OVRManager.isHmdPresent)
+		{
+			OVRManager.HMDMounted -= OnHMDMounted;
+			OVRManager.HMDUnmounted -= OnHMDUnmounted;
+		}
+	}
+
+	// Update is called once per frame
+	void Update()
+	{
+		// Check if the headset is currently mounted
+		if (OVRPlugin.userPresent)
+		{
+			if (!isHeadsetMounted)
+			{
+				OnHMDMounted();
+			}
+		}
+		else
+		{
+			if (isHeadsetMounted)
+			{
+				OnHMDUnmounted();
+			}
+		}
+	}
+}
